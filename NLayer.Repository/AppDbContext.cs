@@ -12,7 +12,7 @@ namespace NLayer.Repository
     public class AppDbContext : DbContext
     {
         //options, veri tabanı yolunu start up dosyasından vermek için kullanıldı
-        protected AppDbContext(DbContextOptions<AppDbContext> options):base(options)
+        protected AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
 
@@ -24,8 +24,28 @@ namespace NLayer.Repository
         //MODEL OLUŞURKEN ÇALIŞACAK OLAN METOT
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+            //ÖRNEK OLARAK GÖSTERİLDİ BEST PRACTIES AÇISINDAN BURADA YAZILMAMALI
+            modelBuilder.Entity<ProductFeature>().HasData(
+                new ProductFeature
+                {
+                    Id = 1,
+                    Color = "Kırmızı",
+                    Height = 100,
+                    Width = 200,
+                    ProductId = 1
+                },
+                new ProductFeature
+                {
+                    Id = 2,
+                    Color = "Mavi",
+                    Height = 100,
+                    Width = 300,
+                    ProductId = 2
+                }
+            );
             base.OnModelCreating(modelBuilder);
         }
 
