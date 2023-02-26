@@ -1,3 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+using NLayer.Core.Repositories;
+using NLayer.Core.Services;
+using NLayer.Core.UnitOfWorks;
+using NLayer.Repository;
+using NLayer.Repository.Repositories;
+using NLayer.Repository.UnitOfWorks;
+using System.Reflection;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +15,23 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+//builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
+
+builder.Services.AddDbContext<AppDbContext>(x =>
+    {
+        // Migration dosyalarý Repository katmanýnda oluþacak, AppDbContext de Repository katmanýnda, bu durumda AppDbContext in bulunmuþ olduüu assemblysini API tarafýnda uygulamaya haber vermek gerekiyor. option ile birlikte içersine girdik ve 
+        x.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection"), option =>
+        {
+            // MigrationsAssembly içerisinde direk isimde yazabilirdik fakat "NLayer.Repository", sonrasýnda isim deðiþikliði olamsý durumunda migration adýnda bozukluk olmasýn diye dinamik olarak çaðýrdýk.
+            // Assembly diye bir sýnýfýmýz var, bunun içerisinden bana bir assemby al diyoruz, oda bize bir tip ver diyor. Burada da AppDbContext in assembly sini al ve bunun adýný getir diyoruz.
+
+            option.MigrationsAssembly(Assembly.GetAssembly(typeof(AppDbContext)).GetName().Name);
+        });
+    });
+
 
 var app = builder.Build();
 
