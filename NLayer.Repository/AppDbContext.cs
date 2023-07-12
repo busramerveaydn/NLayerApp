@@ -30,7 +30,7 @@ namespace NLayer.Repository
 
             //ÖRNEK OLARAK GÖSTERİLDİ BEST PRACTIES AÇISINDAN BURADA YAZILMAMALI
             modelBuilder.Entity<ProductFeature>().HasData(
-                new ProductFeature
+                new ProductFeature()
                 {
                     Id = 1,
                     Color = "Kırmızı",
@@ -38,7 +38,7 @@ namespace NLayer.Repository
                     Width = 200,
                     ProductId = 1
                 },
-                new ProductFeature
+                new ProductFeature()
                 {
                     Id = 2,
                     Color = "Mavi",
