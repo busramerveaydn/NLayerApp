@@ -14,6 +14,8 @@ using NLayer.Service.Mapping;
 using NLayer.Service.Services;
 using System.Reflection;
 
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -24,6 +26,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true; // otomatik oluþturulan modeli kapadýk.
 });
+
+
+builder.Services.AddScoped(typeof(NotFoundFilter<>));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
