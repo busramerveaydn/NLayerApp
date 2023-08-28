@@ -1,8 +1,11 @@
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NLayer.API.Filters;
 using NLayer.API.Middlewares;
+using NLayer.API.Modules;
 using NLayer.Core.DTOs;
 using NLayer.Core.Repositories;
 using NLayer.Core.Services;
@@ -14,6 +17,33 @@ using NLayer.Service.Mapping;
 using NLayer.Service.Services;
 using System.Reflection;
 
+
+//NOT   
+//BUILD IN DI CONTAINER (OTOMATÝK GELEN)
+//Herhangi bir class ýn contrutor ýnda kullanýlanacaðýmýz interface i ve bu interface lere karþýlýk gelen class larý ekliyoruz
+// Defaul olarak gelen DI Container da;
+//  * Constructor Injection ve Method Injection yapabiliyoruz.
+
+//AUTOFAC 
+//Autofac ise defaul olarak gelen build in di containerden daha yeteneklidir.
+//  * Constructor Injection, Method Injection, Property Injection yapabiliyoruz. diðer bir önemli özellik ASP.Net Core da dinamik olarak nesne ekleyebiliyoruz.
+
+
+//********
+
+
+#region OTOMATÝC BUILD IN DI CONTAINER
+
+//builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+//builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+//builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
+
+//builder.Services.AddScoped(typeof(IProductRepository), typeof(ProductRepository));
+//builder.Services.AddScoped(typeof(IProductService), typeof(ProductService));
+
+
+//builder.Services.AddScoped(typeof(ICatcegoryRepository), typeof(CategoryRepository));
+//builder.Services.AddScoped(typeof(ICategoryService), typeof(CategoryService));
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,23 +59,12 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 
 builder.Services.AddScoped(typeof(NotFoundFilter<>));
+builder.Services.AddAutoMapper(typeof(MapProfile));
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
-
-builder.Services.AddScoped(typeof(IProductRepository), typeof(ProductRepository));
-builder.Services.AddScoped(typeof(IProductService), typeof(ProductService));
-
-
-builder.Services.AddScoped(typeof(ICatcegoryRepository), typeof(CategoryRepository));
-builder.Services.AddScoped(typeof(ICategoryService), typeof(CategoryService));
-
-builder.Services.AddAutoMapper(typeof(MapProfile));
 
 
 builder.Services.AddDbContext<AppDbContext>(x =>
@@ -59,6 +78,17 @@ builder.Services.AddDbContext<AppDbContext>(x =>
             option.MigrationsAssembly(Assembly.GetAssembly(typeof(AppDbContext)).GetName().Name);
         });
     });
+
+#endregion
+
+
+#region AUTOFAC
+
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+
+//modulü burada tanýmladýk
+builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder => containerBuilder.RegisterModule(new RepoServiceModule()));
+#endregion
 
 
 var app = builder.Build();
