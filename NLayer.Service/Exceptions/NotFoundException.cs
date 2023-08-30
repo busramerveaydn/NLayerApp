@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace NLayer.Service.Exceptions
 {
-    public class NotFondException : Exception
+    public class NotFoundException : Exception
     {
-        public NotFondException(string message): base(message)
+        public NotFoundException(string message): base(message)
         {
 
         }
