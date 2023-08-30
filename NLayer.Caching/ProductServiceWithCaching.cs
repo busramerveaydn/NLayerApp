@@ -47,7 +47,7 @@ namespace NLayer.Caching
             {
                 // yoksa
                 //_memoryCache.Set(CacheProductKey, _repository.GetAll().ToList()); // datayı reposittorydn alır
-                _memoryCache.Set(CacheProductKey, _repository.GetProductsWithCategory()); 
+                _memoryCache.Set(CacheProductKey, _repository.GetProductsWithCategory());
 
 
             }
@@ -78,13 +78,13 @@ namespace NLayer.Caching
         }
         public async Task RemoveAsync(Product entity)
         {
-             _repository.Remove(entity);
+            _repository.Remove(entity);
 
-            await  _unitOfWork.CommitAsync();
+            await _unitOfWork.CommitAsync();
 
             await CacheAllProductsAsync();
 
-            
+
         }
         public async Task RemoveRangeAsync(IEnumerable<Product> entities)
         {
@@ -112,7 +112,7 @@ namespace NLayer.Caching
         {
             return Task.FromResult(_memoryCache.Get<IEnumerable<Product>>(CacheProductKey));
         }
-        public  Task<Product> GetByIdAsync(int id)
+        public Task<Product> GetByIdAsync(int id)
         {
             var product = _memoryCache.Get<List<Product>>(CacheProductKey).FirstOrDefault(x => x.Id == id);
 
@@ -123,11 +123,11 @@ namespace NLayer.Caching
 
             return Task.FromResult(product);
         }
-        public async Task<CustomResponseDto<List<ProductWithCategoryDto>>> GetProductsWithCategory()
+        public Task<CustomResponseDto<List<ProductWithCategoryDto>>> GetProductsWithCategory()
         {
             var products = _memoryCache.Get<IEnumerable<Product>>(CacheProductKey); //await _repository.GetProductsWithCategory();
             var productsWithCategoryDto = _mapper.Map<List<ProductWithCategoryDto>>(products);
-            return  CustomResponseDto<List<ProductWithCategoryDto>>.Success(200,productsWithCategoryDto);
+            return Task.FromResult(CustomResponseDto<List<ProductWithCategoryDto>>.Success(200, productsWithCategoryDto));  
         }
         public Task<bool> AnyAsync(Expression<Func<Product, bool>> expression)
         {
